@@ -5,7 +5,11 @@ export default function AddLeadForm({ onAddLead }) {
     name: '',
     email: '',
     phone: '',
-    status: ''
+    status: '',
+    job: '',
+    company: '',
+    city: '',
+    message: ''
   });
   const [isFormVisible, setIsFormVisible] = useState(true);
 
@@ -26,7 +30,7 @@ export default function AddLeadForm({ onAddLead }) {
       }
       const data = await res.json();
       onAddLead(data.lead);
-      setFormData({ name: '', email: '', phone: '', status: '' });
+      setFormData({ name: '', email: '', phone: '', status: '', job: '', company: '', city: '', message: '' });
       setIsFormVisible(false); // Hide the form after successful submission
     } catch (error) {
       console.error('Error adding lead:', error);
@@ -71,6 +75,41 @@ export default function AddLeadForm({ onAddLead }) {
               placeholder="Status"
               name="status"
               value={formData.status}
+              onChange={handleInputChange}
+              required
+              style={{ margin: '5px', padding: '8px' }}
+            /><br />
+            <input
+              type="text"
+              placeholder="Job Title"
+              name="job"
+              value={formData.job}
+              onChange={handleInputChange}
+              required
+              style={{ margin: '5px', padding: '8px' }}
+            /><br />
+            <input
+              type="text"
+              placeholder="Company"
+              name="company"
+              value={formData.company}
+              onChange={handleInputChange}
+              required
+              style={{ margin: '5px', padding: '8px' }}
+            /><br />
+            <input
+              type="text"
+              placeholder="City"
+              name="city"
+              value={formData.city}
+              onChange={handleInputChange}
+              required
+              style={{ margin: '5px', padding: '8px' }}
+            /><br />
+            <textarea
+              placeholder="Message"
+              name="message"
+              value={formData.message}
               onChange={handleInputChange}
               required
               style={{ margin: '5px', padding: '8px' }}

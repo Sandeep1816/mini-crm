@@ -12,14 +12,17 @@ export default async function handler(req, res) {
       res.status(500).json({ error: 'Failed to fetch leads' });
     }
   } else if (req.method === 'POST') {
-    const { name, email, phone, status } = req.body;
+    const { name, email, phone, status, company, city, message } = req.body;
     try {
       const newLead = await prisma.lead.create({
         data: { 
           name, 
           email, 
           phone, 
-          status 
+          status, 
+          company, 
+          city, 
+          message 
         },
       });
       res.status(201).json({ lead: newLead });

@@ -17,12 +17,21 @@ generator client {
   provider = "prisma-client-js"
 }
 
+
+
+
+
 model Lead {
-  id     String @id @default(auto()) @map("_id") @db.ObjectId
-  name   String
-  email  String @unique
-  phone  String @unique
-  status String
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  email     String   @unique
+  phone     String   @unique
+  company   String   // Added field for company
+  status    String
+  city      String   // Added field for city
+  message   String   // Added field for message
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
+

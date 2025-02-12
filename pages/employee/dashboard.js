@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import AddLeadForm from '../components/AddLeadForm'; // Adjust the path as necessary
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 
 export default function EmployeeDashboard() {
   const [leads, setLeads] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showAddLeadForm, setShowAddLeadForm] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(null);
 
   useEffect(() => {
     fetchLeads();
@@ -31,6 +34,21 @@ export default function EmployeeDashboard() {
     setShowAddLeadForm(!showAddLeadForm);
   };
 
+  const handleDateChange = (date) => {
+    setSelectedDate(date);
+  };
+
+  const filteredLeads = selectedDate
+    ? leads.filter((lead) => {
+        const leadDate = new Date(lead.createdAt);
+        return (
+          leadDate.getDate() === selectedDate.getDate() &&
+          leadDate.getMonth() === selectedDate.getMonth() &&
+          leadDate.getFullYear() === selectedDate.getFullYear()
+        );
+      })
+    : leads;
+
   return (
     <div style={{ padding: '20px' }}>
       <h1>Employee Dashboard</h1>
@@ -43,6 +61,16 @@ export default function EmployeeDashboard() {
       {showAddLeadForm && <AddLeadForm onAddLead={handleAddLead} />}
 
       <div>
+        <h2>Filter Leads by Date</h2>
+        <DatePicker
+          selected={selectedDate}
+          onChange={handleDateChange}
+          dateFormat="yyyy-MM-dd"
+          placeholderText="Select a date"
+        />
+      </div>
+
+      <div>
         <h2>Leads</h2>
         {loading ? (
           <p>Loading leads...</p>
@@ -53,18 +81,24 @@ export default function EmployeeDashboard() {
                 <th>Name</th>
                 <th>Email</th>
                 <th>Phone Number</th>
+                <th>Company</th>
                 <th>Status</th>
+                <th>City</th>
+                <th>Message</th>
                 <th>Date</th>
                 <th>Time</th>
               </tr>
             </thead>
             <tbody>
-              {leads.map((lead) => (
+              {filteredLeads.map((lead) => (
                 <tr key={lead.id}>
                   <td>{lead.name}</td>
                   <td>{lead.email}</td>
                   <td>{lead.phone}</td>
+                  <td>{lead.company}</td>
                   <td>{lead.status}</td>
+                  <td>{lead.city}</td>
+                  <td>{lead.message}</td>
                   <td>{new Date(lead.createdAt).toLocaleDateString()}</td>
                   <td>{new Date(lead.createdAt).toLocaleTimeString()}</td>
                 </tr>
