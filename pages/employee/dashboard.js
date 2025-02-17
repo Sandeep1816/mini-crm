@@ -1,3 +1,5 @@
+
+
 import React, { useState, useEffect } from 'react';
 import AddLeadForm from '../components/AddLeadForm'; // Adjust the path as necessary
 import DatePicker from 'react-datepicker';
@@ -9,6 +11,7 @@ export default function EmployeeDashboard() {
   const [showAddLeadForm, setShowAddLeadForm] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
   const [filteredLeadsCount, setFilteredLeadsCount] = useState(0);
+  const [editingLead, setEditingLead] = useState(null);
 
   useEffect(() => {
     fetchLeads();
@@ -20,19 +23,19 @@ export default function EmployeeDashboard() {
       const res = await fetch('/api/leads');
       const data = await res.json();
       setLeads(data.leads);
-      setLoading(false);
     } catch (error) {
       console.error('Failed to fetch leads:', error);
+    } finally {
       setLoading(false);
     }
   };
 
   const handleAddLead = (newLead) => {
-    setLeads([...leads, newLead]);
+    setLeads((prevLeads) => [...prevLeads, newLead]);
   };
 
   const toggleAddLeadForm = () => {
-    setShowAddLeadForm(!showAddLeadForm);
+    setShowAddLeadForm((prevShow) => !prevShow);
   };
 
   const handleDateChange = (date) => {
@@ -49,6 +52,36 @@ export default function EmployeeDashboard() {
       setFilteredLeadsCount(count);
     } else {
       setFilteredLeadsCount(0);
+    }
+  };
+
+  const handleEditClick = (lead) => {
+    setEditingLead(lead);
+  };
+
+  const handleUpdateLead = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await fetch('/api/leads', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(editingLead),
+      });
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('Update error:', errorData);
+        throw new Error('Failed to update lead');
+      }
+      const data = await response.json();
+      // Update the local leads state with the updated lead
+      setLeads((prevLeads) =>
+        prevLeads.map((lead) => (lead.id === data.lead.id ? data.lead : lead))
+      );
+      setEditingLead(null);
+    } catch (error) {
+      console.error('handleUpdateLead error:', error);
     }
   };
 
@@ -74,7 +107,7 @@ export default function EmployeeDashboard() {
 
       {showAddLeadForm && <AddLeadForm onAddLead={handleAddLead} />}
 
-      <div>
+      <div style={{ marginBottom: '20px' }}>
         <h2>Filter Leads by Date</h2>
         <DatePicker
           selected={selectedDate}
@@ -88,6 +121,94 @@ export default function EmployeeDashboard() {
           </p>
         )}
       </div>
+
+      {editingLead && (
+        <div style={{ marginBottom: '20px', border: '1px solid #ccc', padding: '16px' }}>
+          <h3>Edit Lead</h3>
+          <form onSubmit={handleUpdateLead}>
+            <div>
+              <label>Name: </label>
+              <input
+                type="text"
+                value={editingLead.name}
+                onChange={(e) =>
+                  setEditingLead({ ...editingLead, name: e.target.value })
+                }
+                required
+              />
+            </div>
+            <div>
+              <label>Email: </label>
+              <input
+                type="email"
+                value={editingLead.email}
+                onChange={(e) =>
+                  setEditingLead({ ...editingLead, email: e.target.value })
+                }
+                required
+              />
+            </div>
+            <div>
+              <label>Phone: </label>
+              <input
+                type="text"
+                value={editingLead.phone}
+                onChange={(e) =>
+                  setEditingLead({ ...editingLead, phone: e.target.value })
+                }
+                required
+              />
+            </div>
+            <div>
+              <label>Status: </label>
+              <input
+                type="text"
+                value={editingLead.status}
+                onChange={(e) =>
+                  setEditingLead({ ...editingLead, status: e.target.value })
+                }
+                required
+              />
+            </div>
+            <div>
+              <label>Company: </label>
+              <input
+                type="text"
+                value={editingLead.company}
+                onChange={(e) =>
+                  setEditingLead({ ...editingLead, company: e.target.value })
+                }
+                required
+              />
+            </div>
+            <div>
+              <label>City: </label>
+              <input
+                type="text"
+                value={editingLead.city}
+                onChange={(e) =>
+                  setEditingLead({ ...editingLead, city: e.target.value })
+                }
+                required
+              />
+            </div>
+            <div>
+              <label>Message: </label>
+              <textarea
+                value={editingLead.message}
+                onChange={(e) =>
+                  setEditingLead({ ...editingLead, message: e.target.value })
+                }
+                required
+              />
+            </div>
+            <button type="submit">Save</button>
+            <button type="button" onClick={() => setEditingLead(null)}>
+              Cancel
+            </button>
+          </form>
+        </div>
+      )}
 
       <div>
         <h2>Leads</h2>
@@ -106,6 +227,7 @@ export default function EmployeeDashboard() {
                 <th>Message</th>
                 <th>Date</th>
                 <th>Time</th>
+                <th>Edit</th>
               </tr>
             </thead>
             <tbody>
@@ -120,6 +242,9 @@ export default function EmployeeDashboard() {
                   <td>{lead.message}</td>
                   <td>{new Date(lead.createdAt).toLocaleDateString()}</td>
                   <td>{new Date(lead.createdAt).toLocaleTimeString()}</td>
+                  <td>
+                    <button onClick={() => handleEditClick(lead)}>Edit</button>
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -129,3 +254,4 @@ export default function EmployeeDashboard() {
     </div>
   );
 }
+

@@ -8,6 +8,11 @@
 
 
 
+
+
+
+
+
 datasource db {
   provider = "mongodb"
   url      = env("MONGODB_URI")
@@ -17,21 +22,18 @@ generator client {
   provider = "prisma-client-js"
 }
 
-
-
-
-
 model Lead {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   name      String
   email     String   @unique
   phone     String   @unique
-  company   String   // Added field for company
+  company   String
   status    String
-  city      String   // Added field for city
-  message   String   // Added field for message
+  city      String
+  message   String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
 
 
